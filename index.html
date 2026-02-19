@@ -11,16 +11,20 @@
         :root {
             --p1-color: #3b82f6;
             --p2-color: #ef4444;
+            --p1-bg: #eff6ff;
+            --p2-bg: #fef2f2;
         }
 
         body {
             font-family: 'Fredoka+One', cursive;
             margin: 0;
             overflow: hidden;
-            background-color: #22c55e; /* Grass green */
-            touch-action: manipulation;
+            background-color: #22c55e;
+            touch-action: none; /* Prevents zooming/panning */
             user-select: none;
             -webkit-user-select: none;
+            height: 100vh;
+            width: 100vw;
         }
 
         /* Landscape Enforcement */
@@ -28,24 +32,25 @@
             display: none;
             position: fixed;
             inset: 0;
-            background: #1e293b;
+            background: #0f172a;
             color: white;
             z-index: 9999;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
+            padding: 20px;
         }
 
         @media (orientation: portrait) {
             #rotate-notice { display: flex; }
         }
 
-        /* Start Screen Overlay */
+        /* Start Screen */
         #start-screen {
             position: fixed;
             inset: 0;
-            background: linear-gradient(135deg, #3b82f6 0%, #22c55e 50%, #ef4444 100%);
+            background: linear-gradient(135deg, #2563eb 0%, #16a34a 50%, #dc2626 100%);
             z-index: 5000;
             display: flex;
             flex-direction: column;
@@ -53,35 +58,129 @@
             align-items: center;
             color: white;
             text-align: center;
+            padding: 20px;
         }
 
-        /* 3-Section Layout */
+        /* Main Game Layout - Responsive Grid */
         .game-container {
             display: grid;
-            grid-template-columns: 340px 1fr 340px; /* Slightly wider player zones */
-            height: 100vh;
-            width: 100vw;
+            grid-template-columns: 28% 44% 28%; /* Fluid 3-column layout */
+            height: 100%;
+            width: 100%;
         }
 
         /* Player Zones */
         .player-zone {
             display: flex;
             flex-direction: column;
-            justify-content: center; /* Center vertically */
-            padding: 2rem; /* Increased padding */
-            background: rgba(255, 255, 255, 0.95);
+            padding: 1.5vh 1.5vw;
             z-index: 20;
             box-shadow: 0 0 20px rgba(0,0,0,0.2);
-            gap: 1rem;
+            position: relative;
+            height: 100%;
+            box-sizing: border-box;
         }
 
-        .player-1 { border-right: 8px solid var(--p1-color); }
-        .player-2 { border-left: 8px solid var(--p2-color); }
+        .player-1 { 
+            background: var(--p1-bg); 
+            border-right: 6px solid var(--p1-color); 
+        }
+        
+        .player-2 { 
+            background: var(--p2-bg); 
+            border-left: 6px solid var(--p2-color); 
+        }
+
+        /* Header Area (Score & Name) */
+        .header-area {
+            flex: 0 0 auto;
+            margin-bottom: 1vh;
+        }
+
+        .player-title {
+            font-size: clamp(1rem, 2.5vw, 1.5rem);
+            color: #1e293b;
+            margin-bottom: 0.5vh;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .progress-bar {
+            height: 1.5vh;
+            min-height: 10px;
+            background: #e2e8f0;
+            border-radius: 99px;
+            overflow: hidden;
+        }
+
+        .progress-fill { height: 100%; transition: width 0.5s ease; }
+
+        /* Question & Answer Display */
+        .display-area {
+            flex: 0 0 auto;
+            text-align: center;
+            margin-bottom: 1vh;
+        }
+
+        .q-text {
+            font-size: clamp(1.5rem, 4vh, 3rem);
+            color: #334155;
+            margin-bottom: 0.5vh;
+        }
+
+        .answer-box {
+            font-family: 'Bungee', cursive;
+            background: white;
+            border: 3px dashed #94a3b8;
+            border-radius: 12px;
+            height: clamp(50px, 10vh, 80px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(2rem, 5vh, 3.5rem);
+            color: #0f172a;
+        }
+
+        /* Responsive Keypad */
+        .keypad {
+            flex: 1; /* Takes remaining space */
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            gap: 1.5vh 1.5vw;
+            padding: 1vh 0;
+        }
+
+        .keypad button {
+            background: white;
+            border: 2px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: clamp(1.2rem, 3vh, 2rem);
+            color: #334155;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #94a3b8;
+            transition: transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%; /* Fill grid cell */
+            padding: 0;
+        }
+
+        .keypad button:active {
+            transform: translateY(2px);
+            box-shadow: 0 0 0 #94a3b8;
+        }
+
+        .keypad .btn-ok { background: #22c55e; color: white; border-color: #16a34a; box-shadow: 0 3px 0 #15803d; }
+        .keypad .btn-c { background: #ef4444; color: white; border-color: #dc2626; box-shadow: 0 3px 0 #b91c1c; }
 
         /* Central Tug Zone */
         .tug-zone {
             position: relative;
-            background: #8b5e3c; /* Dirt pit */
+            background: #8b5e3c;
             overflow: hidden;
             display: flex;
             align-items: center;
@@ -90,30 +189,28 @@
 
         .grass-overlay {
             position: absolute;
-            top: 0; bottom: 0; left: 0; right: 0;
-            background: 
-                radial-gradient(circle at 50% 50%, transparent 40%, #22c55e 41%);
+            inset: 0;
+            background: radial-gradient(circle at 50% 50%, transparent 35%, #22c55e 36%);
             pointer-events: none;
         }
 
-        /* Rope & Characters */
         .rope-system {
             position: absolute;
             width: 200%;
-            height: 20px;
+            height: 16px;
             background: repeating-linear-gradient(45deg, #d97706, #d97706 10px, #b45309 10px, #b45309 20px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
             z-index: 10;
-            margin-top: 50px; 
+            margin-top: 5vh;
         }
 
         .flag {
-            width: 40px;
-            height: 60px;
+            width: 30px;
+            height: 50px;
             background: #fbbf24;
             clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 25% 50%);
             transform: rotate(90deg);
@@ -123,201 +220,121 @@
 
         .character {
             position: absolute;
-            font-size: 90px;
-            bottom: -35px; 
-            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.2));
+            font-size: clamp(60px, 15vh, 100px);
+            bottom: -3vh;
+            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.2));
             transform-origin: bottom center;
         }
 
         .char-p1 { 
-            left: 35%; 
+            left: 38%; 
             transform: scaleX(-1); 
             animation: pull-p1 1.5s infinite ease-in-out;
         }
         
         .char-p2 { 
-            right: 35%; 
+            right: 38%; 
             animation: pull-p2 1.5s infinite ease-in-out;
         }
 
-        /* Pulling Animations */
         @keyframes pull-p1 {
             0%, 100% { transform: scaleX(-1) rotate(0deg); }
-            50% { transform: scaleX(-1) rotate(15deg); }
+            50% { transform: scaleX(-1) rotate(10deg); }
         }
-
         @keyframes pull-p2 {
             0%, 100% { transform: rotate(0deg); }
-            50% { transform: rotate(-15deg); }
+            50% { transform: rotate(-10deg); }
         }
         
-        /* Rope Jerk Animation on score */
-        @keyframes rope-jerk {
-            0% { margin-top: 50px; }
-            50% { margin-top: 45px; }
-            100% { margin-top: 50px; }
-        }
-        .jerk { animation: rope-jerk 0.2s ease-in-out; }
+        .jerk { animation: jerk 0.2s ease-in-out; }
+        @keyframes jerk { 0% { margin-top: 5vh; } 50% { margin-top: 4.5vh; } 100% { margin-top: 5vh; } }
 
-        /* UI Elements */
-        .keypad {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px; /* Increased gap */
-            padding: 10px;
-            background: #f1f5f9;
-            border-radius: 1rem;
-        }
+        /* Effects */
+        .shake { animation: shake 0.3s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake { 10%, 90% { transform: translate3d(-2px, 0, 0); } 20%, 80% { transform: translate3d(4px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-6px, 0, 0); } 40%, 60% { transform: translate3d(6px, 0, 0); } }
 
-        .keypad button {
-            background: white;
-            border: 2px solid #cbd5e1;
-            border-radius: 12px;
-            font-size: 1.5rem;
-            padding: 12px 0;
-            transition: all 0.1s;
-            box-shadow: 0 4px 0 #94a3b8;
-            color: #334155;
-            cursor: pointer;
-        }
-
-        .keypad button:active {
-            transform: translateY(2px);
-            box-shadow: 0 2px 0 #94a3b8;
-        }
-
-        .keypad .btn-ok { background: #22c55e; color: white; border-color: #16a34a; box-shadow: 0 4px 0 #15803d; font-weight: bold; }
-        .keypad .btn-c { background: #ef4444; color: white; border-color: #dc2626; box-shadow: 0 4px 0 #b91c1c; font-weight: bold; }
-        .keypad .btn-num { font-weight: bold; }
-
-        .answer-display {
-            font-family: 'Bungee', cursive;
-            background: #f8fafc;
-            border: 4px dashed #cbd5e1;
-            border-radius: 20px;
-            height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-            margin-bottom: 0.5rem;
-            color: #1e293b;
-        }
-
-        .progress-bar {
-            height: 20px;
-            background: #e2e8f0;
-            border-radius: 12px;
-            overflow: hidden;
-            margin-bottom: 0.5rem;
-        }
-
-        .progress-fill {
-            height: 100%;
-            transition: width 0.5s ease;
-        }
-
-        /* Animations */
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
-        }
-        .shake { animation: shake 0.2s ease-in-out 2; }
-
-        @keyframes pop {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
-        .pop { animation: pop 0.4s ease-out; }
+        .pop { animation: pop 0.3s ease-out; }
+        @keyframes pop { 50% { transform: scale(1.15); } }
 
         .win-screen {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.95);
             z-index: 2000;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             color: white;
+            text-align: center;
         }
 
-        canvas#particles {
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            z-index: 100;
-        }
-        
-        .q-text { font-size: 2.5rem; font-weight: bold; }
-        
-        .header-area { margin-bottom: 10px; }
+        canvas#particles { position: absolute; inset: 0; pointer-events: none; z-index: 100; }
     </style>
 </head>
 <body>
 
     <!-- Orientation Warning -->
     <div id="rotate-notice">
-        <h1 class="text-4xl mb-4">🔄 PLEASE ROTATE</h1>
-        <p class="text-xl">Landscape mode-la vachikonga!</p>
+        <h1 class="text-3xl mb-4 text-yellow-400">Please Rotate Device 🔄</h1>
+        <p>This game works best in Landscape mode!</p>
     </div>
 
     <!-- Start Screen -->
     <div id="start-screen">
-        <h1 class="text-6xl mb-4 text-yellow-300 drop-shadow-lg" style="font-family: 'Bungee', cursive;">MATH TUG-OF-WAR</h1>
-        <p class="text-2xl mb-8">Ready to pull the rope? (First to 10 Wins!)</p>
-        <button onclick="startGame()" class="bg-green-500 hover:bg-green-600 text-white text-2xl px-10 py-5 rounded-full font-bold shadow-xl border-b-8 border-green-700 active:border-b-0 active:translate-y-2 transition-all">
-            START GAME (FULL SCREEN) 🚀
+        <h1 class="text-5xl md:text-7xl mb-4 text-yellow-300 drop-shadow-lg" style="font-family: 'Bungee', cursive;">MATH TUG-OF-WAR</h1>
+        <p class="text-xl md:text-2xl mb-8 opacity-90">First to 10 Wins! 🏆</p>
+        <button onclick="startGame()" class="bg-white text-blue-600 hover:bg-gray-100 text-2xl px-12 py-4 rounded-full font-bold shadow-xl transition-transform hover:scale-105 active:scale-95 border-b-4 border-gray-300">
+            PLAY NOW ▶
         </button>
     </div>
 
     <!-- Win Screen -->
     <div id="win-screen" class="win-screen">
-        <h1 id="win-text" class="text-7xl mb-8 text-yellow-400">PLAYER 1 WINS!</h1>
-        <button onclick="location.reload()" class="bg-blue-600 hover:bg-blue-700 text-white text-3xl px-12 py-6 rounded-full font-bold shadow-xl transform transition hover:scale-105">
-            PLAY AGAIN
+        <h1 id="win-text" class="text-5xl md:text-8xl mb-4 text-yellow-400 font-black">WINNER!</h1>
+        <div class="text-2xl mb-8" id="win-subtext">Amazing Job!</div>
+        <button onclick="location.reload()" class="bg-green-500 hover:bg-green-600 text-white text-2xl px-10 py-4 rounded-xl font-bold shadow-lg transform transition hover:scale-105">
+            Play Again 🔄
         </button>
     </div>
 
     <canvas id="particles"></canvas>
 
     <div class="game-container">
-        <!-- Player 1 Side -->
+        <!-- Player 1 (Blue) -->
         <div class="player-zone player-1" id="p1-container">
             <div class="header-area">
-                <div class="flex justify-between items-end mb-2">
-                    <h2 class="text-blue-600 text-xl md:text-2xl">BLUE TEAM</h2>
-                    <span id="p1-score-text" class="text-lg font-bold text-blue-800">0 / 10</span>
+                <div class="player-title">
+                    <span class="text-blue-700 font-black">BLUE TEAM</span>
+                    <span id="p1-score-text" class="text-blue-900">0/10</span>
                 </div>
                 <div class="progress-bar">
                     <div id="p1-progress" class="progress-fill bg-blue-500" style="width: 0%"></div>
                 </div>
             </div>
 
-            <div class="text-center py-2">
-                <div id="p1-q" class="q-text text-slate-700 mb-2">5 + 2 = ?</div>
-                <div id="p1-ans" class="answer-display"></div>
+            <div class="display-area">
+                <div id="p1-q" class="q-text">Ready?</div>
+                <div id="p1-ans" class="answer-box"></div>
             </div>
 
             <div class="keypad">
-                <button class="btn-num" onclick="addInput(1, '1')">1</button>
-                <button class="btn-num" onclick="addInput(1, '2')">2</button>
-                <button class="btn-num" onclick="addInput(1, '3')">3</button>
-                <button class="btn-num" onclick="addInput(1, '4')">4</button>
-                <button class="btn-num" onclick="addInput(1, '5')">5</button>
-                <button class="btn-num" onclick="addInput(1, '6')">6</button>
-                <button class="btn-num" onclick="addInput(1, '7')">7</button>
-                <button class="btn-num" onclick="addInput(1, '8')">8</button>
-                <button class="btn-num" onclick="addInput(1, '9')">9</button>
-                <button class="btn-num" onclick="addInput(1, '0')">0</button>
+                <button onclick="addInput(1, '1')">1</button>
+                <button onclick="addInput(1, '2')">2</button>
+                <button onclick="addInput(1, '3')">3</button>
+                <button onclick="addInput(1, '4')">4</button>
+                <button onclick="addInput(1, '5')">5</button>
+                <button onclick="addInput(1, '6')">6</button>
+                <button onclick="addInput(1, '7')">7</button>
+                <button onclick="addInput(1, '8')">8</button>
+                <button onclick="addInput(1, '9')">9</button>
+                <button onclick="addInput(1, '0')">0</button>
                 <button onclick="clearInput(1)" class="btn-c">DEL</button>
                 <button onclick="submitAns(1)" class="btn-ok">GO</button>
             </div>
         </div>
 
-        <!-- Central Animation Zone -->
+        <!-- Animation Zone -->
         <div class="tug-zone">
             <div class="grass-overlay"></div>
             
@@ -327,41 +344,40 @@
                 <div class="char-p2 character">🐯</div>
             </div>
 
-            <!-- Pit markers -->
-            <div class="absolute inset-0 flex justify-between pointer-events-none px-4">
-                <div class="h-full w-2 bg-blue-400 opacity-50 dashed-line"></div>
-                <div class="h-full w-2 bg-red-400 opacity-50 dashed-line"></div>
+            <div class="absolute inset-0 flex justify-between pointer-events-none px-2 opacity-40">
+                <div class="h-full w-1 bg-blue-500 border-l-2 border-dashed border-white"></div>
+                <div class="h-full w-1 bg-red-500 border-l-2 border-dashed border-white"></div>
             </div>
         </div>
 
-        <!-- Player 2 Side -->
+        <!-- Player 2 (Red) -->
         <div class="player-zone player-2" id="p2-container">
             <div class="header-area">
-                <div class="flex justify-between items-end mb-2">
-                    <span id="p2-score-text" class="text-lg font-bold text-red-800">0 / 10</span>
-                    <h2 class="text-red-600 text-xl md:text-2xl">RED TEAM</h2>
+                <div class="player-title">
+                    <span id="p2-score-text" class="text-red-900">0/10</span>
+                    <span class="text-red-700 font-black">RED TEAM</span>
                 </div>
                 <div class="progress-bar">
                     <div id="p2-progress" class="progress-fill bg-red-500" style="width: 0%"></div>
                 </div>
             </div>
 
-            <div class="text-center py-2">
-                <div id="p2-q" class="q-text text-slate-700 mb-2">12 - 4 = ?</div>
-                <div id="p2-ans" class="answer-display"></div>
+            <div class="display-area">
+                <div id="p2-q" class="q-text">Ready?</div>
+                <div id="p2-ans" class="answer-box"></div>
             </div>
 
             <div class="keypad">
-                <button class="btn-num" onclick="addInput(2, '1')">1</button>
-                <button class="btn-num" onclick="addInput(2, '2')">2</button>
-                <button class="btn-num" onclick="addInput(2, '3')">3</button>
-                <button class="btn-num" onclick="addInput(2, '4')">4</button>
-                <button class="btn-num" onclick="addInput(2, '5')">5</button>
-                <button class="btn-num" onclick="addInput(2, '6')">6</button>
-                <button class="btn-num" onclick="addInput(2, '7')">7</button>
-                <button class="btn-num" onclick="addInput(2, '8')">8</button>
-                <button class="btn-num" onclick="addInput(2, '9')">9</button>
-                <button class="btn-num" onclick="addInput(2, '0')">0</button>
+                <button onclick="addInput(2, '1')">1</button>
+                <button onclick="addInput(2, '2')">2</button>
+                <button onclick="addInput(2, '3')">3</button>
+                <button onclick="addInput(2, '4')">4</button>
+                <button onclick="addInput(2, '5')">5</button>
+                <button onclick="addInput(2, '6')">6</button>
+                <button onclick="addInput(2, '7')">7</button>
+                <button onclick="addInput(2, '8')">8</button>
+                <button onclick="addInput(2, '9')">9</button>
+                <button onclick="addInput(2, '0')">0</button>
                 <button onclick="clearInput(2)" class="btn-c">DEL</button>
                 <button onclick="submitAns(2)" class="btn-ok">GO</button>
             </div>
@@ -369,7 +385,7 @@
     </div>
 
     <script>
-        const GOAL = 10; // Changed to 10
+        const GOAL = 10;
         let gameState = {
             p1: { score: 0, input: "", current: {} },
             p2: { score: 0, input: "", current: {} }
@@ -380,10 +396,11 @@
         let particles = [];
 
         function startGame() {
-            const el = document.documentElement;
-            if (el.requestFullscreen) el.requestFullscreen();
-            else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-            else if (el.msRequestFullscreen) el.msRequestFullscreen();
+            try {
+                const el = document.documentElement;
+                if (el.requestFullscreen) el.requestFullscreen();
+                else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+            } catch(e) { console.log("Fullscreen not supported"); }
 
             document.getElementById('start-screen').style.display = 'none';
             init();
@@ -403,17 +420,18 @@
         }
 
         function newQuestion(player) {
+            // Abacus style logic: simple double digits or single
             const isAdd = Math.random() > 0.4;
             let a, b, q, ans;
 
             if (isAdd) {
                 a = Math.floor(Math.random() * 15) + 1;
-                b = Math.floor(Math.random() * 10) + 1;
+                b = Math.floor(Math.random() * 9) + 1;
                 q = `${a} + ${b}`;
                 ans = a + b;
             } else {
-                a = Math.floor(Math.random() * 20) + 10;
-                b = Math.floor(Math.random() * a) + 1;
+                a = Math.floor(Math.random() * 19) + 5;
+                b = Math.floor(Math.random() * (a - 1)) + 1; // Ensure answer > 0
                 q = `${a} - ${b}`;
                 ans = a - b;
             }
@@ -445,20 +463,26 @@
             if (parseInt(p.input) === p.current.ans) {
                 p.score++;
                 spawnParticles(player);
-                display.classList.add('pop');
-                setTimeout(() => display.classList.remove('pop'), 400);
                 
-                // Add jerk animation to rope
+                // Pop animation
+                display.classList.remove('pop');
+                void display.offsetWidth;
+                display.classList.add('pop');
+                
+                // Rope Jerk
                 const rope = document.getElementById('rope-system');
                 rope.classList.remove('jerk');
-                void rope.offsetWidth; // trigger reflow
+                void rope.offsetWidth;
                 rope.classList.add('jerk');
 
                 newQuestion(player);
                 updateUI();
             } else {
+                // Shake animation
+                container.classList.remove('shake');
+                void container.offsetWidth; 
                 container.classList.add('shake');
-                setTimeout(() => container.classList.remove('shake'), 400);
+                
                 clearInput(player);
             }
 
@@ -466,19 +490,19 @@
         }
 
         function updateUI() {
+            // Update progress bars
             document.getElementById('p1-progress').style.width = `${(gameState.p1.score / GOAL) * 100}%`;
             document.getElementById('p2-progress').style.width = `${(gameState.p2.score / GOAL) * 100}%`;
-            document.getElementById('p1-score-text').innerText = `${gameState.p1.score} / ${GOAL}`;
-            document.getElementById('p2-score-text').innerText = `${gameState.p2.score} / ${GOAL}`;
+            document.getElementById('p1-score-text').innerText = `${gameState.p1.score}/${GOAL}`;
+            document.getElementById('p2-score-text').innerText = `${gameState.p2.score}/${GOAL}`;
 
-            // Calculate rope shift
-            // Logic: 
-            // If P2 scores, rope moves to the RIGHT (Positive Translate)
-            // If P1 scores, rope moves to the LEFT (Negative Translate)
+            // Rope Physics
+            // P2 Score -> Rope moves Right (+ve)
+            // P1 Score -> Rope moves Left (-ve)
             const diff = gameState.p2.score - gameState.p1.score;
             
-            // Limit shift to stay within visual bounds (approx +/- 45%)
-            let shiftPercent = diff * 5; // Increased scale factor for faster movement with fewer questions
+            // Limit movement to approx 45% of width
+            let shiftPercent = diff * 5; 
             if (shiftPercent > 45) shiftPercent = 45;
             if (shiftPercent < -45) shiftPercent = -45;
             
@@ -486,15 +510,19 @@
         }
 
         function spawnParticles(player) {
-            const x = player === 1 ? 250 : window.innerWidth - 250;
-            const y = window.innerHeight / 2;
-            for (let i = 0; i < 20; i++) {
+            // Spawn particles relative to screen size
+            const isLeft = player === 1;
+            // Left side center approx 15%, Right side center approx 85%
+            const x = isLeft ? window.innerWidth * 0.15 : window.innerWidth * 0.85;
+            const y = window.innerHeight * 0.5;
+
+            for (let i = 0; i < 25; i++) {
                 particles.push({
                     x, y,
-                    vx: (Math.random() - 0.5) * 15,
-                    vy: (Math.random() - 0.5) * 15,
+                    vx: (Math.random() - 0.5) * (window.innerWidth / 50),
+                    vy: (Math.random() - 0.5) * (window.innerHeight / 50),
                     size: Math.random() * 10 + 5,
-                    color: player === 1 ? '#3b82f6' : '#ef4444',
+                    color: isLeft ? '#3b82f6' : '#ef4444',
                     life: 1.0
                 });
             }
@@ -520,13 +548,14 @@
         function endGame(winner) {
             const modal = document.getElementById('win-screen');
             const txt = document.getElementById('win-text');
+            const sub = document.getElementById('win-subtext');
+            
             modal.style.display = 'flex';
-            txt.innerText = winner === 1 ? "BLUE TEAM WINS! 🦁" : "RED TEAM WINS! 🐯";
-            txt.style.color = winner === 1 ? "#3b82f6" : "#ef4444";
-        }
-
-        window.addEventListener('resize', resize);
-        // Start screen handles init
-    </script>
-</body>
-</html>
+            if (winner === 1) {
+                txt.innerText = "BLUE TEAM WINS!";
+                txt.style.color = "#3b82f6";
+                sub.innerText = "The Lion roars! 🦁";
+            } else {
+                txt.innerText = "RED TEAM WINS!";
+                txt.style.color = "#ef4444";
+                sub.innerText = "The Tig
