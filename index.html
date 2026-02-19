@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ultimate Math Tug-of-War</title>
+    <title>Math Tug-of-War (Secure)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Bungee&family=Fredoka+One&display=swap');
@@ -19,13 +19,19 @@
             font-family: 'Fredoka+One', cursive;
             margin: 0;
             overflow: hidden;
-            background-color: #22c55e;
-            touch-action: none; /* Prevents zooming/panning */
+            background-color: #16a34a;
+            touch-action: none;
             user-select: none;
             -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
             height: 100vh;
             width: 100vw;
+            cursor: default;
         }
+
+        /* Prevent interactions */
+        img, div { -webkit-user-drag: none; user-drag: none; }
 
         /* Landscape Enforcement */
         #rotate-notice {
@@ -34,7 +40,7 @@
             inset: 0;
             background: #0f172a;
             color: white;
-            z-index: 9999;
+            z-index: 10000;
             flex-direction: column;
             justify-content: center;
             align-items: center;
@@ -42,16 +48,14 @@
             padding: 20px;
         }
 
-        @media (orientation: portrait) {
-            #rotate-notice { display: flex; }
-        }
+        @media (orientation: portrait) { #rotate-notice { display: flex; } }
 
         /* Start Screen */
         #start-screen {
             position: fixed;
             inset: 0;
             background: linear-gradient(135deg, #2563eb 0%, #16a34a 50%, #dc2626 100%);
-            z-index: 5000;
+            z-index: 9000;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -61,44 +65,41 @@
             padding: 20px;
         }
 
-        /* Main Game Layout - Responsive Grid */
+        /* Main Grid */
         .game-container {
             display: grid;
-            grid-template-columns: 28% 44% 28%; /* Fluid 3-column layout */
+            grid-template-columns: 28% 44% 28%;
             height: 100%;
             width: 100%;
+            position: relative;
         }
 
-        /* Player Zones */
+        /* Player Zones - Pushed apart with space-between */
         .player-zone {
             display: flex;
             flex-direction: column;
-            padding: 1.5vh 1.5vw;
-            z-index: 20;
-            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            justify-content: space-between; /* Pushes keypad to bottom */
+            padding: 2vh 1.5vw;
+            z-index: 50;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
             position: relative;
             height: 100%;
             box-sizing: border-box;
         }
 
-        .player-1 { 
-            background: var(--p1-bg); 
-            border-right: 6px solid var(--p1-color); 
-        }
-        
-        .player-2 { 
-            background: var(--p2-bg); 
-            border-left: 6px solid var(--p2-color); 
+        .player-1 { background: var(--p1-bg); border-right: 6px solid var(--p1-color); }
+        .player-2 { background: var(--p2-bg); border-left: 6px solid var(--p2-color); }
+
+        /* Top Section Group (Header + Question) */
+        .top-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1vh;
         }
 
-        /* Header Area (Score & Name) */
-        .header-area {
-            flex: 0 0 auto;
-            margin-bottom: 1vh;
-        }
-
+        .header-area { flex: 0 0 auto; }
         .player-title {
-            font-size: clamp(1rem, 2.5vw, 1.5rem);
+            font-size: clamp(0.9rem, 2vw, 1.4rem);
             color: #1e293b;
             margin-bottom: 0.5vh;
             display: flex;
@@ -107,161 +108,145 @@
         }
 
         .progress-bar {
-            height: 1.5vh;
-            min-height: 10px;
-            background: #e2e8f0;
+            height: 1.2vh;
+            min-height: 6px;
+            background: #cbd5e1;
             border-radius: 99px;
             overflow: hidden;
+            border: 2px solid white;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
         }
-
         .progress-fill { height: 100%; transition: width 0.5s ease; }
 
-        /* Question & Answer Display */
         .display-area {
             flex: 0 0 auto;
             text-align: center;
-            margin-bottom: 1vh;
         }
-
         .q-text {
-            font-size: clamp(1.5rem, 4vh, 3rem);
+            font-size: clamp(1.4rem, 3.5vw, 2.2rem);
             color: #334155;
             margin-bottom: 0.5vh;
+            text-shadow: 1px 1px 0px white;
         }
-
         .answer-box {
             font-family: 'Bungee', cursive;
             background: white;
             border: 3px dashed #94a3b8;
             border-radius: 12px;
-            height: clamp(50px, 10vh, 80px);
+            height: clamp(45px, 8vh, 70px);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: clamp(2rem, 5vh, 3.5rem);
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
             color: #0f172a;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
         }
 
-        /* Responsive Keypad */
+        /* Compact Keypad at Bottom */
         .keypad {
-            flex: 1; /* Takes remaining space */
+            flex: 0 0 auto;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(4, 1fr);
-            gap: 1.5vh 1.5vw;
-            padding: 1vh 0;
+            gap: 0.8vh 0.8vw;
+            padding-top: 1vh;
+            width: 100%;
+            max-width: 260px;
+            align-self: center;
         }
 
         .keypad button {
             background: white;
             border: 2px solid #cbd5e1;
             border-radius: 10px;
-            font-size: clamp(1.2rem, 3vh, 2rem);
+            font-size: clamp(1.1rem, 2.2vw, 1.6rem);
             color: #334155;
             cursor: pointer;
             box-shadow: 0 3px 0 #94a3b8;
-            transition: transform 0.1s;
+            transition: transform 0.1s, box-shadow 0.1s;
             display: flex;
             align-items: center;
             justify-content: center;
             width: 100%;
-            height: 100%; /* Fill grid cell */
+            height: clamp(35px, 6.5vh, 55px);
             padding: 0;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .keypad button:active {
-            transform: translateY(2px);
-            box-shadow: 0 0 0 #94a3b8;
-        }
-
+        .keypad button:active { transform: translateY(3px); box-shadow: 0 0 0 #94a3b8; }
         .keypad .btn-ok { background: #22c55e; color: white; border-color: #16a34a; box-shadow: 0 3px 0 #15803d; }
+        .keypad .btn-ok:active { box-shadow: 0 0 0 #15803d; }
         .keypad .btn-c { background: #ef4444; color: white; border-color: #dc2626; box-shadow: 0 3px 0 #b91c1c; }
+        .keypad .btn-c:active { box-shadow: 0 0 0 #b91c1c; }
 
-        /* Central Tug Zone */
+        /* Animation Zone */
         .tug-zone {
             position: relative;
-            background: #8b5e3c;
+            background: #92400e;
             overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
+            z-index: 10;
         }
-
         .grass-overlay {
             position: absolute;
             inset: 0;
-            background: radial-gradient(circle at 50% 50%, transparent 35%, #22c55e 36%);
+            background: radial-gradient(circle at 50% 50%, transparent 30%, #16a34a 31%);
             pointer-events: none;
         }
-
         .rope-system {
             position: absolute;
             width: 200%;
-            height: 16px;
+            height: 14px; /* Thinner rope */
             background: repeating-linear-gradient(45deg, #d97706, #d97706 10px, #b45309 10px, #b45309 20px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
             display: flex;
             align-items: center;
             justify-content: center;
             transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-            z-index: 10;
-            margin-top: 5vh;
+            z-index: 20;
+            margin-top: 6vh;
         }
-
         .flag {
-            width: 30px;
-            height: 50px;
+            width: 24px;
+            height: 40px;
             background: #fbbf24;
             clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 25% 50%);
             transform: rotate(90deg);
             position: absolute;
-            top: -20px;
+            top: -16px;
+            border-left: 3px solid rgba(0,0,0,0.1);
         }
-
+        
+        /* Smaller Characters */
         .character {
             position: absolute;
-            font-size: clamp(60px, 15vh, 100px);
-            bottom: -3vh;
-            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.2));
+            font-size: clamp(30px, 8vh, 60px); /* Reduced size */
+            bottom: -2.5vh;
+            filter: drop-shadow(0 3px 3px rgba(0,0,0,0.3));
             transform-origin: bottom center;
+            pointer-events: none;
         }
+        .char-p1 { left: 40%; transform: scaleX(-1); animation: pull-p1 1.5s infinite ease-in-out; }
+        .char-p2 { right: 40%; animation: pull-p2 1.5s infinite ease-in-out; }
 
-        .char-p1 { 
-            left: 38%; 
-            transform: scaleX(-1); 
-            animation: pull-p1 1.5s infinite ease-in-out;
-        }
-        
-        .char-p2 { 
-            right: 38%; 
-            animation: pull-p2 1.5s infinite ease-in-out;
-        }
-
-        @keyframes pull-p1 {
-            0%, 100% { transform: scaleX(-1) rotate(0deg); }
-            50% { transform: scaleX(-1) rotate(10deg); }
-        }
-        @keyframes pull-p2 {
-            0%, 100% { transform: rotate(0deg); }
-            50% { transform: rotate(-10deg); }
-        }
-        
+        @keyframes pull-p1 { 0%, 100% { transform: scaleX(-1) rotate(0deg); } 50% { transform: scaleX(-1) rotate(10deg); } }
+        @keyframes pull-p2 { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-10deg); } }
         .jerk { animation: jerk 0.2s ease-in-out; }
-        @keyframes jerk { 0% { margin-top: 5vh; } 50% { margin-top: 4.5vh; } 100% { margin-top: 5vh; } }
+        @keyframes jerk { 0% { margin-top: 6vh; } 50% { margin-top: 5vh; } 100% { margin-top: 6vh; } }
 
         /* Effects */
-        .shake { animation: shake 0.3s cubic-bezier(.36,.07,.19,.97) both; }
+        .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
         @keyframes shake { 10%, 90% { transform: translate3d(-2px, 0, 0); } 20%, 80% { transform: translate3d(4px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-6px, 0, 0); } 40%, 60% { transform: translate3d(6px, 0, 0); } }
-
         .pop { animation: pop 0.3s ease-out; }
-        @keyframes pop { 50% { transform: scale(1.15); } }
+        @keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.2); color: #16a34a; } 100% { transform: scale(1); } }
 
         .win-screen {
             display: none;
             position: fixed;
             inset: 0;
             background: rgba(0,0,0,0.95);
-            z-index: 2000;
+            z-index: 9999;
             flex-direction: column;
             justify-content: center;
             align-items: center;
@@ -270,30 +255,33 @@
         }
 
         canvas#particles { position: absolute; inset: 0; pointer-events: none; z-index: 100; }
+        .pit-mark { position: absolute; height: 100%; width: 4px; opacity: 0.3; border-left: 4px dashed rgba(255,255,255,0.8); }
+        .pit-left { left: 10px; background: blue; }
+        .pit-right { right: 10px; background: red; }
     </style>
 </head>
-<body>
+<body oncontextmenu="return false">
 
     <!-- Orientation Warning -->
     <div id="rotate-notice">
-        <h1 class="text-3xl mb-4 text-yellow-400">Please Rotate Device 🔄</h1>
-        <p>This game works best in Landscape mode!</p>
+        <h1 class="text-4xl mb-4 text-yellow-400">Please Rotate Device 🔄</h1>
     </div>
 
     <!-- Start Screen -->
     <div id="start-screen">
-        <h1 class="text-5xl md:text-7xl mb-4 text-yellow-300 drop-shadow-lg" style="font-family: 'Bungee', cursive;">MATH TUG-OF-WAR</h1>
-        <p class="text-xl md:text-2xl mb-8 opacity-90">First to 10 Wins! 🏆</p>
-        <button onclick="startGame()" class="bg-white text-blue-600 hover:bg-gray-100 text-2xl px-12 py-4 rounded-full font-bold shadow-xl transition-transform hover:scale-105 active:scale-95 border-b-4 border-gray-300">
+        <h1 class="text-5xl md:text-7xl mb-4 text-yellow-300 drop-shadow-xl" style="font-family: 'Bungee', cursive;">MATH TUG-OF-WAR</h1>
+        <p class="text-xl md:text-2xl mb-8 font-bold">First to 10 Wins! 🏆</p>
+        <button onclick="startGame()" class="bg-white text-green-700 hover:bg-gray-100 text-2xl px-12 py-5 rounded-full font-black shadow-2xl transition-transform hover:scale-105 active:scale-95 border-b-8 border-gray-300">
             PLAY NOW ▶
         </button>
+        <p class="mt-4 text-sm opacity-75">Full Screen • Sound On</p>
     </div>
 
     <!-- Win Screen -->
     <div id="win-screen" class="win-screen">
-        <h1 id="win-text" class="text-5xl md:text-8xl mb-4 text-yellow-400 font-black">WINNER!</h1>
-        <div class="text-2xl mb-8" id="win-subtext">Amazing Job!</div>
-        <button onclick="location.reload()" class="bg-green-500 hover:bg-green-600 text-white text-2xl px-10 py-4 rounded-xl font-bold shadow-lg transform transition hover:scale-105">
+        <h1 id="win-text" class="text-6xl md:text-8xl mb-4 text-yellow-400 font-black drop-shadow-lg">WINNER!</h1>
+        <div class="text-3xl mb-8 font-bold" id="win-subtext">Amazing Job!</div>
+        <button onclick="location.reload()" class="bg-blue-500 hover:bg-blue-600 text-white text-2xl px-12 py-5 rounded-xl font-bold shadow-xl transform transition hover:scale-105 active:scale-95">
             Play Again 🔄
         </button>
     </div>
@@ -303,88 +291,124 @@
     <div class="game-container">
         <!-- Player 1 (Blue) -->
         <div class="player-zone player-1" id="p1-container">
-            <div class="header-area">
-                <div class="player-title">
-                    <span class="text-blue-700 font-black">BLUE TEAM</span>
-                    <span id="p1-score-text" class="text-blue-900">0/10</span>
+            <div class="top-section">
+                <div class="header-area">
+                    <div class="player-title">
+                        <span class="text-blue-700 font-black">BLUE TEAM</span>
+                        <span id="p1-score-text" class="text-blue-900 font-bold">0/10</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div id="p1-progress" class="progress-fill bg-blue-500" style="width: 0%"></div>
+                    </div>
                 </div>
-                <div class="progress-bar">
-                    <div id="p1-progress" class="progress-fill bg-blue-500" style="width: 0%"></div>
-                </div>
-            </div>
 
-            <div class="display-area">
-                <div id="p1-q" class="q-text">Ready?</div>
-                <div id="p1-ans" class="answer-box"></div>
+                <div class="display-area">
+                    <div id="p1-q" class="q-text">Ready?</div>
+                    <div id="p1-ans" class="answer-box"></div>
+                </div>
             </div>
 
             <div class="keypad">
-                <button onclick="addInput(1, '1')">1</button>
-                <button onclick="addInput(1, '2')">2</button>
-                <button onclick="addInput(1, '3')">3</button>
-                <button onclick="addInput(1, '4')">4</button>
-                <button onclick="addInput(1, '5')">5</button>
-                <button onclick="addInput(1, '6')">6</button>
-                <button onclick="addInput(1, '7')">7</button>
-                <button onclick="addInput(1, '8')">8</button>
-                <button onclick="addInput(1, '9')">9</button>
-                <button onclick="addInput(1, '0')">0</button>
-                <button onclick="clearInput(1)" class="btn-c">DEL</button>
-                <button onclick="submitAns(1)" class="btn-ok">GO</button>
+                <button onmousedown="addInput(1, '1')">1</button>
+                <button onmousedown="addInput(1, '2')">2</button>
+                <button onmousedown="addInput(1, '3')">3</button>
+                <button onmousedown="addInput(1, '4')">4</button>
+                <button onmousedown="addInput(1, '5')">5</button>
+                <button onmousedown="addInput(1, '6')">6</button>
+                <button onmousedown="addInput(1, '7')">7</button>
+                <button onmousedown="addInput(1, '8')">8</button>
+                <button onmousedown="addInput(1, '9')">9</button>
+                <button onmousedown="addInput(1, '0')">0</button>
+                <button onmousedown="clearInput(1)" class="btn-c">✖</button>
+                <button onmousedown="submitAns(1)" class="btn-ok">✔</button>
             </div>
         </div>
 
         <!-- Animation Zone -->
         <div class="tug-zone">
             <div class="grass-overlay"></div>
+            <div class="pit-mark pit-left"></div>
+            <div class="pit-mark pit-right"></div>
             
             <div id="rope-system" class="rope-system">
                 <div class="char-p1 character">🦁</div>
                 <div class="flag"></div>
                 <div class="char-p2 character">🐯</div>
             </div>
-
-            <div class="absolute inset-0 flex justify-between pointer-events-none px-2 opacity-40">
-                <div class="h-full w-1 bg-blue-500 border-l-2 border-dashed border-white"></div>
-                <div class="h-full w-1 bg-red-500 border-l-2 border-dashed border-white"></div>
-            </div>
         </div>
 
         <!-- Player 2 (Red) -->
         <div class="player-zone player-2" id="p2-container">
-            <div class="header-area">
-                <div class="player-title">
-                    <span id="p2-score-text" class="text-red-900">0/10</span>
-                    <span class="text-red-700 font-black">RED TEAM</span>
+            <div class="top-section">
+                <div class="header-area">
+                    <div class="player-title">
+                        <span id="p2-score-text" class="text-red-900 font-bold">0/10</span>
+                        <span class="text-red-700 font-black">RED TEAM</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div id="p2-progress" class="progress-fill bg-red-500" style="width: 0%"></div>
+                    </div>
                 </div>
-                <div class="progress-bar">
-                    <div id="p2-progress" class="progress-fill bg-red-500" style="width: 0%"></div>
-                </div>
-            </div>
 
-            <div class="display-area">
-                <div id="p2-q" class="q-text">Ready?</div>
-                <div id="p2-ans" class="answer-box"></div>
+                <div class="display-area">
+                    <div id="p2-q" class="q-text">Ready?</div>
+                    <div id="p2-ans" class="answer-box"></div>
+                </div>
             </div>
 
             <div class="keypad">
-                <button onclick="addInput(2, '1')">1</button>
-                <button onclick="addInput(2, '2')">2</button>
-                <button onclick="addInput(2, '3')">3</button>
-                <button onclick="addInput(2, '4')">4</button>
-                <button onclick="addInput(2, '5')">5</button>
-                <button onclick="addInput(2, '6')">6</button>
-                <button onclick="addInput(2, '7')">7</button>
-                <button onclick="addInput(2, '8')">8</button>
-                <button onclick="addInput(2, '9')">9</button>
-                <button onclick="addInput(2, '0')">0</button>
-                <button onclick="clearInput(2)" class="btn-c">DEL</button>
-                <button onclick="submitAns(2)" class="btn-ok">GO</button>
+                <button onmousedown="addInput(2, '1')">1</button>
+                <button onmousedown="addInput(2, '2')">2</button>
+                <button onmousedown="addInput(2, '3')">3</button>
+                <button onmousedown="addInput(2, '4')">4</button>
+                <button onmousedown="addInput(2, '5')">5</button>
+                <button onmousedown="addInput(2, '6')">6</button>
+                <button onmousedown="addInput(2, '7')">7</button>
+                <button onmousedown="addInput(2, '8')">8</button>
+                <button onmousedown="addInput(2, '9')">9</button>
+                <button onmousedown="addInput(2, '0')">0</button>
+                <button onmousedown="clearInput(2)" class="btn-c">✖</button>
+                <button onmousedown="submitAns(2)" class="btn-ok">✔</button>
             </div>
         </div>
     </div>
 
     <script>
+        // --- Security / Kiosk Mode Scripts ---
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F12' || 
+                (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) || 
+                (e.ctrlKey && (e.key === 'u' || e.key === 'U' || e.key === 's' || e.key === 'S' || e.key === 'p' || e.key === 'P'))) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }
+        });
+
+        // --- Sound System ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playTone(freq, type, duration, delay = 0) {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime + delay);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime + delay);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + delay + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(audioCtx.currentTime + delay);
+            osc.stop(audioCtx.currentTime + delay + duration);
+        }
+
+        function playCorrect() { if(audioCtx.state === 'suspended') audioCtx.resume(); playTone(600, 'sine', 0.1); playTone(800, 'sine', 0.2, 0.1); }
+        function playWrong() { if(audioCtx.state === 'suspended') audioCtx.resume(); playTone(200, 'sawtooth', 0.3); playTone(150, 'sawtooth', 0.3, 0.1); }
+        function playWin() { if(audioCtx.state === 'suspended') audioCtx.resume(); [523, 659, 783, 1046, 783, 1046].forEach((f, i) => playTone(f, 'square', 0.2, i * 0.15)); }
+        function playClick() { if(audioCtx.state === 'suspended') audioCtx.resume(); playTone(400, 'triangle', 0.05); }
+
+        // --- Game Logic ---
         const GOAL = 10;
         let gameState = {
             p1: { score: 0, input: "", current: {} },
@@ -396,12 +420,10 @@
         let particles = [];
 
         function startGame() {
-            try {
-                const el = document.documentElement;
-                if (el.requestFullscreen) el.requestFullscreen();
-                else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-            } catch(e) { console.log("Fullscreen not supported"); }
-
+            const el = document.documentElement;
+            if (el.requestFullscreen) el.requestFullscreen().catch(() => {});
+            else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
             document.getElementById('start-screen').style.display = 'none';
             init();
         }
@@ -420,22 +442,19 @@
         }
 
         function newQuestion(player) {
-            // Abacus style logic: simple double digits or single
             const isAdd = Math.random() > 0.4;
             let a, b, q, ans;
-
             if (isAdd) {
-                a = Math.floor(Math.random() * 15) + 1;
-                b = Math.floor(Math.random() * 9) + 1;
+                a = Math.floor(Math.random() * 15) + 2; 
+                b = Math.floor(Math.random() * 10) + 1;
                 q = `${a} + ${b}`;
                 ans = a + b;
             } else {
-                a = Math.floor(Math.random() * 19) + 5;
-                b = Math.floor(Math.random() * (a - 1)) + 1; // Ensure answer > 0
+                a = Math.floor(Math.random() * 18) + 5; 
+                b = Math.floor(Math.random() * (a - 2)) + 1; 
                 q = `${a} - ${b}`;
                 ans = a - b;
             }
-
             gameState[`p${player}`].current = { q, ans };
             gameState[`p${player}`].input = "";
             document.getElementById(`p${player}-q`).innerText = `${q} = ?`;
@@ -443,12 +462,14 @@
         }
 
         function addInput(player, val) {
+            playClick();
             const p = gameState[`p${player}`];
             if (p.input.length < 3) p.input += val;
             document.getElementById(`p${player}-ans`).innerText = p.input;
         }
 
         function clearInput(player) {
+            playClick();
             gameState[`p${player}`].input = "";
             document.getElementById(`p${player}-ans`).innerText = "";
         }
@@ -462,14 +483,12 @@
 
             if (parseInt(p.input) === p.current.ans) {
                 p.score++;
-                spawnParticles(player);
-                
-                // Pop animation
+                playCorrect();
+                spawnParticles(player, 'star');
                 display.classList.remove('pop');
                 void display.offsetWidth;
                 display.classList.add('pop');
                 
-                // Rope Jerk
                 const rope = document.getElementById('rope-system');
                 rope.classList.remove('jerk');
                 void rope.offsetWidth;
@@ -478,11 +497,10 @@
                 newQuestion(player);
                 updateUI();
             } else {
-                // Shake animation
+                playWrong();
                 container.classList.remove('shake');
                 void container.offsetWidth; 
                 container.classList.add('shake');
-                
                 clearInput(player);
             }
 
@@ -490,18 +508,12 @@
         }
 
         function updateUI() {
-            // Update progress bars
             document.getElementById('p1-progress').style.width = `${(gameState.p1.score / GOAL) * 100}%`;
             document.getElementById('p2-progress').style.width = `${(gameState.p2.score / GOAL) * 100}%`;
             document.getElementById('p1-score-text').innerText = `${gameState.p1.score}/${GOAL}`;
             document.getElementById('p2-score-text').innerText = `${gameState.p2.score}/${GOAL}`;
 
-            // Rope Physics
-            // P2 Score -> Rope moves Right (+ve)
-            // P1 Score -> Rope moves Left (-ve)
             const diff = gameState.p2.score - gameState.p1.score;
-            
-            // Limit movement to approx 45% of width
             let shiftPercent = diff * 5; 
             if (shiftPercent > 45) shiftPercent = 45;
             if (shiftPercent < -45) shiftPercent = -45;
@@ -509,21 +521,21 @@
             document.getElementById('rope-system').style.transform = `translateX(${shiftPercent}%)`;
         }
 
-        function spawnParticles(player) {
-            // Spawn particles relative to screen size
+        function spawnParticles(player, type) {
             const isLeft = player === 1;
-            // Left side center approx 15%, Right side center approx 85%
             const x = isLeft ? window.innerWidth * 0.15 : window.innerWidth * 0.85;
-            const y = window.innerHeight * 0.5;
+            const y = window.innerHeight * 0.4;
+            const color = isLeft ? '#3b82f6' : '#ef4444';
 
-            for (let i = 0; i < 25; i++) {
+            for (let i = 0; i < 30; i++) {
                 particles.push({
                     x, y,
-                    vx: (Math.random() - 0.5) * (window.innerWidth / 50),
-                    vy: (Math.random() - 0.5) * (window.innerHeight / 50),
-                    size: Math.random() * 10 + 5,
-                    color: isLeft ? '#3b82f6' : '#ef4444',
-                    life: 1.0
+                    vx: (Math.random() - 0.5) * (window.innerWidth / 30),
+                    vy: (Math.random() - 0.5) * (window.innerHeight / 30),
+                    size: Math.random() * 12 + 4,
+                    color: color,
+                    life: 1.0,
+                    type: type
                 });
             }
         }
@@ -533,29 +545,51 @@
             particles.forEach((p, i) => {
                 p.x += p.vx;
                 p.y += p.vy;
-                p.vy += 0.5; // Gravity
-                p.life -= 0.03;
+                p.vy += 0.5;
+                p.life -= 0.02;
                 ctx.globalAlpha = p.life;
                 ctx.fillStyle = p.color;
+                
                 ctx.beginPath();
-                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                if (p.type === 'star') ctx.rect(p.x, p.y, p.size, p.size);
+                else ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
                 ctx.fill();
+                
                 if (p.life <= 0) particles.splice(i, 1);
             });
             requestAnimationFrame(particleLoop);
         }
 
         function endGame(winner) {
+            playWin();
             const modal = document.getElementById('win-screen');
             const txt = document.getElementById('win-text');
             const sub = document.getElementById('win-subtext');
-            
             modal.style.display = 'flex';
             if (winner === 1) {
-                txt.innerText = "BLUE TEAM WINS!";
+                txt.innerText = "BLUE WINS!";
                 txt.style.color = "#3b82f6";
                 sub.innerText = "The Lion roars! 🦁";
             } else {
-                txt.innerText = "RED TEAM WINS!";
+                txt.innerText = "RED WINS!";
                 txt.style.color = "#ef4444";
-                sub.innerText = "The Tig
+                sub.innerText = "The Tiger triumphs! 🐯";
+            }
+            for(let i=0; i<100; i++) {
+                particles.push({
+                    x: window.innerWidth / 2,
+                    y: window.innerHeight / 2,
+                    vx: (Math.random() - 0.5) * 50,
+                    vy: (Math.random() - 0.5) * 50,
+                    size: Math.random() * 20,
+                    color: `hsl(${Math.random()*360}, 100%, 50%)`,
+                    life: 2.0,
+                    type: 'confetti'
+                });
+            }
+        }
+
+        window.addEventListener('resize', resize);
+    </script>
+</body>
+</html>
