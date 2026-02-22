@@ -67,22 +67,21 @@
             text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
         }
         .watermark-img { 
-            height: clamp(30px, 8vh, 50px); 
+            height: clamp(25px, 6vh, 45px); 
             width: auto; 
-            margin-bottom: 5px;
+            margin-bottom: 3px;
             border-radius: 8px; 
         }
         .watermark-text { 
             font-family: 'Bungee', cursive; 
-            font-size: clamp(1.2rem, 3vh, 1.8rem); 
+            font-size: clamp(1rem, 2.5vh, 1.5rem); 
             white-space: nowrap; 
         }
 
-        /* Start Screen */
-        #start-screen {
+        /* Overlays (Start, Pause, Win) */
+        .overlay-screen {
             position: fixed;
             inset: 0;
-            background: linear-gradient(135deg, #2563eb 0%, #16a34a 50%, #dc2626 100%);
             z-index: 9000;
             display: flex;
             flex-direction: column;
@@ -93,47 +92,50 @@
             padding: 20px;
         }
 
-        #start-screen h1 {
-            font-size: clamp(2rem, 6vw, 4rem);
-            line-height: 1.1;
+        #start-screen { background: linear-gradient(135deg, #2563eb 0%, #16a34a 50%, #dc2626 100%); }
+        
+        #pause-screen {
+            display: none;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 9500;
+            backdrop-filter: blur(5px);
         }
 
-        /* Settings Panel */
+        #win-screen {
+            display: none;
+            background: rgba(0,0,0,0.95);
+            z-index: 9999;
+        }
+
+        /* Settings Panel (Smaller and Compact) */
         .settings-panel {
             background: rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(10px);
             border: 2px solid rgba(255, 255, 255, 0.4);
-            border-radius: 20px;
-            padding: clamp(10px, 3vh, 20px) clamp(15px, 4vw, 30px);
-            margin-bottom: clamp(15px, 4vh, 30px);
+            border-radius: 16px;
+            padding: clamp(10px, 2vh, 15px) clamp(15px, 3vw, 25px);
+            margin-bottom: clamp(10px, 3vh, 20px);
             text-align: left;
             width: 100%;
-            max-width: 400px;
-            max-height: 50vh; /* Prevents overflow on short screens */
-            overflow-y: auto;
+            max-width: 320px;
         }
-
-        /* Custom Scrollbar for Settings */
-        .settings-panel::-webkit-scrollbar { width: 6px; }
-        .settings-panel::-webkit-scrollbar-track { background: transparent; }
-        .settings-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.5); border-radius: 10px; }
 
         .settings-panel label {
             font-family: 'Bungee', cursive;
-            font-size: clamp(0.8rem, 2vh, 1rem);
+            font-size: clamp(0.7rem, 1.5vh, 0.85rem);
             color: #fbbf24;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
             display: block;
-            margin-top: clamp(8px, 2vh, 15px);
-            margin-bottom: 5px;
+            margin-top: 10px;
+            margin-bottom: 4px;
         }
 
         .settings-panel select {
             width: 100%;
-            padding: clamp(6px, 1.5vh, 10px);
-            border-radius: 8px;
+            padding: clamp(4px, 1vh, 8px);
+            border-radius: 6px;
             font-family: 'Fredoka+One', cursive;
-            font-size: clamp(0.9rem, 2.2vh, 1.1rem);
+            font-size: clamp(0.8rem, 1.8vh, 1rem);
             color: #1e293b;
             border: none;
             outline: none;
@@ -141,7 +143,7 @@
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        /* Main Grid - Fully Responsive */
+        /* Main Grid */
         .game-container {
             display: grid;
             grid-template-columns: 28% 44% 28%;
@@ -150,38 +152,26 @@
             position: relative;
         }
 
-        @media (max-width: 1024px) {
-            .game-container { grid-template-columns: 32% 36% 32%; }
-        }
-        @media (max-width: 768px) {
-            .game-container { grid-template-columns: 34% 32% 34%; }
-        }
-
         /* Player Zones */
         .player-zone {
             display: flex;
             flex-direction: column;
+            justify-content: space-between;
             padding: 2vh 1.5vw;
             z-index: 50;
             box-shadow: 0 0 20px rgba(0,0,0,0.3);
             position: relative;
             height: 100%;
             box-sizing: border-box;
-            gap: 1.5vh;
         }
 
         .player-1 { background: var(--p1-bg); border-right: 6px solid var(--p1-color); }
         .player-2 { background: var(--p2-bg); border-left: 6px solid var(--p2-color); }
 
-        .top-section { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 1vh; 
-            flex: 0 0 auto; 
-        }
-
+        .top-section { display: flex; flex-direction: column; gap: 1vh; }
+        .header-area { flex: 0 0 auto; }
         .player-title {
-            font-size: clamp(0.8rem, 2vw, 1.4rem);
+            font-size: clamp(0.7rem, 1.8vw, 1.2rem);
             color: #1e293b;
             margin-bottom: 0.5vh;
             display: flex;
@@ -190,7 +180,7 @@
         }
 
         .progress-bar {
-            height: clamp(6px, 1.5vh, 12px);
+            height: clamp(6px, 1.2vh, 10px);
             background: #cbd5e1;
             border-radius: 99px;
             overflow: hidden;
@@ -199,47 +189,45 @@
         }
         .progress-fill { height: 100%; transition: width 0.5s ease; }
 
-        .display-area { text-align: center; }
-        
+        .display-area { flex: 0 0 auto; text-align: center; }
         .q-text {
-            font-size: clamp(1.2rem, 3vw, 2.2rem);
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
             color: #334155;
             margin-bottom: 0.5vh;
             text-shadow: 1px 1px 0px white;
-            white-space: nowrap;
         }
-        
         .answer-box {
             font-family: 'Bungee', cursive;
             background: white;
             border: 3px dashed #94a3b8;
             border-radius: 12px;
-            height: clamp(35px, 8vh, 70px);
+            height: clamp(30px, 6vh, 55px);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: clamp(1.4rem, 3.5vw, 2.8rem);
+            font-size: clamp(1.4rem, 3.5vw, 2.2rem);
             color: #0f172a;
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
         }
 
-        /* Fully Fluid Keypad */
+        /* Reverted & Resized Keypad */
         .keypad {
-            flex: 1; /* Takes remaining vertical space */
+            flex: 0 0 auto;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(4, 1fr); /* 4 rows automatically sized */
-            gap: clamp(3px, 1vh, 8px) clamp(3px, 1vw, 8px);
+            gap: clamp(4px, 0.8vh, 8px) clamp(4px, 0.8vw, 8px);
+            padding-top: 1vh;
             width: 100%;
-            max-width: 280px;
-            margin: 0 auto; /* Centers it horizontally */
+            max-width: 220px; /* Made max-width smaller */
+            align-self: center;
+            margin-bottom: 2vh;
         }
 
         .keypad button {
             background: white;
             border: 2px solid #cbd5e1;
-            border-radius: 10px;
-            font-size: clamp(1.1rem, 2.5vh, 1.8rem);
+            border-radius: 8px; /* Slightly tighter corners */
+            font-size: clamp(0.9rem, 2vw, 1.4rem); /* Smaller font */
             color: #334155;
             cursor: pointer;
             box-shadow: 0 3px 0 #94a3b8;
@@ -248,7 +236,7 @@
             align-items: center;
             justify-content: center;
             width: 100%;
-            height: 100%; /* Fills the grid row height */
+            height: clamp(30px, 5.5vh, 45px); /* Smaller height */
             padding: 0;
             -webkit-tap-highlight-color: transparent;
         }
@@ -279,7 +267,7 @@
         .rope-system {
             position: absolute;
             width: 200%;
-            height: clamp(8px, 2vh, 14px);
+            height: clamp(8px, 1.5vh, 12px);
             background: repeating-linear-gradient(45deg, #d97706, #d97706 10px, #b45309 10px, #b45309 20px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.4);
             display: flex;
@@ -290,20 +278,20 @@
             margin-top: 6vh;
         }
         .flag {
-            width: clamp(16px, 3vw, 24px);
-            height: clamp(26px, 5vh, 40px);
+            width: clamp(16px, 2vw, 24px);
+            height: clamp(28px, 4vh, 40px);
             background: #fbbf24;
             clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 25% 50%);
             transform: rotate(90deg);
             position: absolute;
-            top: -2vh;
+            top: -16px;
             border-left: 3px solid rgba(0,0,0,0.1);
         }
         
         .character {
             position: absolute;
-            font-size: clamp(25px, 7vh, 50px);
-            bottom: -2.5vh;
+            font-size: clamp(25px, 6vh, 45px);
+            bottom: -2vh;
             filter: drop-shadow(0 3px 3px rgba(0,0,0,0.3));
             transform-origin: bottom center;
             pointer-events: none;
@@ -322,19 +310,6 @@
         .pop { animation: pop 0.3s ease-out; }
         @keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.2); color: #16a34a; } 100% { transform: scale(1); } }
 
-        .win-screen {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.95);
-            z-index: 9999;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            text-align: center;
-        }
-
         canvas#particles { position: absolute; inset: 0; pointer-events: none; z-index: 100; }
         .pit-mark { position: absolute; height: 100%; width: 4px; opacity: 0.3; border-left: 4px dashed rgba(255,255,255,0.8); z-index: 15; }
         .pit-left { left: 10px; background: blue; }
@@ -349,11 +324,11 @@
     </div>
 
     <div id="rotate-notice">
-        <h1 class="text-4xl mb-4 text-yellow-400">Please Rotate Device 🔄</h1>
+        <h1 class="text-3xl mb-4 text-yellow-400">Please Rotate Device 🔄</h1>
     </div>
 
-    <div id="start-screen">
-        <h1 class="mb-4 text-white drop-shadow-xl" style="font-family: 'Bungee', cursive;">ABACUS MATH TUG-OF-WAR</h1>
+    <div id="start-screen" class="overlay-screen">
+        <h1 class="text-4xl md:text-5xl mb-2 text-white drop-shadow-xl" style="font-family: 'Bungee', cursive;">ABACUS MATH<br>TUG-OF-WAR</h1>
         
         <div class="settings-panel">
             <label for="game-mode">Game Mode</label>
@@ -385,16 +360,23 @@
             </div>
         </div>
 
-        <button onclick="startGame()" class="bg-yellow-400 text-yellow-900 hover:bg-yellow-300 text-xl md:text-2xl px-10 py-3 md:py-4 rounded-full font-black shadow-2xl transition-transform hover:scale-105 active:scale-95 border-b-8 border-yellow-600">
+        <button onclick="startGame()" class="bg-yellow-400 text-yellow-900 hover:bg-yellow-300 text-lg md:text-xl px-8 py-3 rounded-full font-black shadow-xl transition-transform hover:scale-105 active:scale-95 border-b-4 border-yellow-600">
             START GAME ▶
         </button>
-        <p class="mt-4 text-xs md:text-sm opacity-75">First to 10 Wins! • Sound On</p>
+        <p class="mt-3 text-xs opacity-75">First to 10 Wins! • Sound On</p>
     </div>
 
-    <div id="win-screen" class="win-screen">
-        <h1 id="win-text" class="text-5xl md:text-8xl mb-4 text-yellow-400 font-black drop-shadow-lg">WINNER!</h1>
-        <div class="text-2xl md:text-3xl mb-8 font-bold" id="win-subtext">Amazing Job!</div>
-        <button onclick="location.reload()" class="bg-blue-500 hover:bg-blue-600 text-white text-xl md:text-2xl px-10 py-4 rounded-xl font-bold shadow-xl transform transition hover:scale-105 active:scale-95">
+    <div id="pause-screen" class="overlay-screen">
+        <h1 class="text-5xl md:text-6xl text-yellow-400 mb-6 drop-shadow-lg" style="font-family: 'Bungee', cursive;">PAUSED</h1>
+        <button onclick="resumeGame()" class="bg-blue-500 hover:bg-blue-600 text-white text-xl md:text-2xl px-10 py-4 rounded-xl font-bold shadow-xl transition-transform hover:scale-105 active:scale-95 border-b-4 border-blue-700">
+            RESUME ▶
+        </button>
+    </div>
+
+    <div id="win-screen" class="overlay-screen">
+        <h1 id="win-text" class="text-5xl md:text-7xl mb-3 text-yellow-400 font-black drop-shadow-lg" style="font-family: 'Bungee', cursive;">WINNER!</h1>
+        <div class="text-xl md:text-2xl mb-6 font-bold" id="win-subtext">Amazing Job!</div>
+        <button onclick="location.reload()" class="bg-green-500 hover:bg-green-600 text-white text-lg md:text-xl px-8 py-3 rounded-xl font-bold shadow-xl transition-transform hover:scale-105 active:scale-95 border-b-4 border-green-700">
             Play Again 🔄
         </button>
     </div>
@@ -528,6 +510,9 @@
 
         // --- Game Logic ---
         const GOAL = 10;
+        let gameActive = false;
+        let gameEnded = false;
+        
         let gameState = {
             p1: { score: 0, input: "", current: {} },
             p2: { score: 0, input: "", current: {} }
@@ -538,12 +523,35 @@
         let particles = [];
 
         function startGame() {
+            gameActive = true;
             const el = document.documentElement;
             if (el.requestFullscreen) el.requestFullscreen().catch(() => {});
             else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
             if (audioCtx.state === 'suspended') audioCtx.resume();
             document.getElementById('start-screen').style.display = 'none';
             init();
+        }
+
+        function resumeGame() {
+            const el = document.documentElement;
+            if (el.requestFullscreen) el.requestFullscreen().catch(() => {});
+            else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            document.getElementById('pause-screen').style.display = 'none';
+        }
+
+        // Pause Game if Fullscreen Exits
+        document.addEventListener('fullscreenchange', checkFullscreen);
+        document.addEventListener('webkitfullscreenchange', checkFullscreen);
+
+        function checkFullscreen() {
+            if (gameActive && !gameEnded) {
+                if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                    document.getElementById('pause-screen').style.display = 'flex';
+                } else {
+                    document.getElementById('pause-screen').style.display = 'none';
+                }
+            }
         }
 
         function init() {
@@ -617,9 +625,9 @@
                 q = `${a} × ${b}`;
             } 
             else if (activeMode === 'div') {
-                b = Math.floor(Math.random() * 8) + 2; // Divisor (1 digit: 2 to 9)
-                a = Math.floor(Math.random() * 999) + 1; // Dividend (1 to 3 digits)
-                ans = Math.floor(a / b); // Calculate only the quotient, ignoring remainder
+                b = Math.floor(Math.random() * 8) + 2; 
+                a = Math.floor(Math.random() * 999) + 1; 
+                ans = Math.floor(a / b); 
                 q = `${a} ÷ ${b}`;
             }
             
@@ -635,6 +643,7 @@
         }
 
         function addInput(player, val) {
+            if(gameEnded) return;
             playClick();
             const p = gameState[`p${player}`];
             if (p.input.length < 5) p.input += val;
@@ -642,12 +651,14 @@
         }
 
         function clearInput(player) {
+            if(gameEnded) return;
             playClick();
             gameState[`p${player}`].input = "";
             document.getElementById(`p${player}-ans`).innerText = "";
         }
 
         function submitAns(player) {
+            if(gameEnded) return;
             const p = gameState[`p${player}`];
             const display = document.getElementById(`p${player}-ans`);
             const container = document.getElementById(`p${player}-container`);
@@ -734,6 +745,7 @@
         }
 
         function endGame(winner) {
+            gameEnded = true;
             playWin();
             const modal = document.getElementById('win-screen');
             const txt = document.getElementById('win-text');
